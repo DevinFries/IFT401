@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 import os
 import datetime
@@ -60,6 +60,15 @@ def generate_initial_stocks():
 if not Stock.query.first():
     generate_initial_stocks()
 
+# Random stock price generator
+def update_stock_prices():
+    stocks = Stock.query.all()
+    for stock in stocks:
+        fluctuation = random.uniform(-10, 10)  # Random fluctuation in percentage
+        new_price = stock.current_price * (1 + fluctuation / 100)
+        stock.current_price = round(new_price, 2)
+    db.session.commit()
+
 # Define routes
 @app.route("/")
 def home():
@@ -72,11 +81,14 @@ def contact():
 
 @app.route("/trade", methods=['GET', 'POST'])
 def trade():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     if request.method == 'POST':
         stock_ticker = request.form['stock_ticker']
         number_of_shares = int(request.form['number_of_shares'])
         action = request.form['action']  # Buy or sell
-        user = User.query.first()  # For demonstration purposes, get the first user
+        user = User.query.get(session['user_id'])
 
         stock = Stock.query.filter_by(ticker=stock_ticker).first()
         if stock:
@@ -105,27 +117,5 @@ def trade():
                     flash('Stock sold successfully', 'success')
                 else:
                     flash('Insufficient shares to sell', 'failure')
-            db.session.commit()
-        else:
-            flash('Invalid stock ticker', 'failure')
+           
 
-        return redirect(url_for('trade'))
-
-    return render_template('trade.html')
-
-@app.route("/portfolio")
-def portfolio():
-    user = User.query.first()  # For demonstration purposes, get the first user
-    return render_template('portfolio.html', user=user)
-
-@app.route("/transaction_history")
-def transaction_history():
-    user = User.query.first()  # For demonstration purposes, get the first user
-    transactions = user.transactions
-    return render_template('transaction_history.html', transactions=transactions)
-
-@app.route("/admin", methods=['GET', 'POST'])
-def admin():
-    if request.method == 'POST':
-        # Check if user is authenticated and authorized as admin
-        # For demonstration
