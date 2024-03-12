@@ -1,34 +1,34 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 import os
 import datetime
 import random
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+ 
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'team2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost:3386/stocks'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Define database models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
+    full_naqme = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)  # Hashed password for security
     cash_balance = db.Column(db.Float, default=0.0)
     is_admin = db.Column(db.Boolean, default=False)
-    transactions = db.relationship('Transaction', backref='user', lazy=True)
 
 class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(100), nullable=False)
-    ticker = db.Column(db.String(10), unique=True, nullable=False)
-    volume = db.Column(db.Integer, nullable=False)
-    initial_price = db.Column(db.Float, nullable=False)
-    current_price = db.Column(db.Float, nullable=False)
-    transactions = db.relationship('Transaction', backref='stock', lazy=True)
+    ticker_symbol = db.Column(db.String(10), unique=True, nullable=False)
+    volume = db.Column(db.Integer, nullable=False) # Volume of the stock available for trading.
+    price = db.Column(db.Float, nullable=False) 
+
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
