@@ -92,7 +92,7 @@ def trade():
                     db.session.add(transaction)
                     flash('Stock purchased successfully', 'success')
                 else:
-                    flash('Insufficient funds', 'danger')
+                    flash('Insufficient funds', 'failure')
             elif action == 'sell':
                 if number_of_shares <= stock.volume:
                     # Add cash balance
@@ -104,10 +104,10 @@ def trade():
                     db.session.add(transaction)
                     flash('Stock sold successfully', 'success')
                 else:
-                    flash('Insufficient shares to sell', 'danger')
+                    flash('Insufficient shares to sell', 'failure')
             db.session.commit()
         else:
-            flash('Invalid stock ticker', 'danger')
+            flash('Invalid stock ticker', 'failure')
 
         return redirect(url_for('trade'))
 
