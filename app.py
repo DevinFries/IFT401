@@ -40,25 +40,26 @@ class Transaction(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 # Initialize the database
-db.create_all()
+def create_app():
+    db.create_all()
 
-# Generate initial stock data (for demonstration purposes)
-def generate_initial_stocks():
-    stocks_data = [
-        {"company_name": "Apple Inc.", "ticker": "AAPL", "volume": 1000, "initial_price": 150.0},
-        {"company_name": "Microsoft Corporation", "ticker": "MSFT", "volume": 800, "initial_price": 300.0},
-        {"company_name": "Alphabet Inc.", "ticker": "GOOGL", "volume": 600, "initial_price": 2500.0},
-        {"company_name": "Facebook, Inc.", "ticker": "FB", "volume": 700, "initial_price": 350.0}
-    ]
-    for stock_data in stocks_data:
-        stock = Stock(**stock_data)
-        stock.current_price = stock.initial_price  # Set current price initially
-        db.session.add(stock)
-    db.session.commit()
+    # Generate initial stock data (for demonstration purposes)
+    def generate_initial_stocks():
+        stocks_data = [
+            {"company_name": "Apple Inc.", "ticker": "AAPL", "volume": 1000, "initial_price": 150.0},
+            {"company_name": "Microsoft Corporation", "ticker": "MSFT", "volume": 800, "initial_price": 300.0},
+            {"company_name": "Alphabet Inc.", "ticker": "GOOGL", "volume": 600, "initial_price": 2500.0},
+            {"company_name": "Facebook, Inc.", "ticker": "FB", "volume": 700, "initial_price": 350.0}
+        ]
+        for stock_data in stocks_data:
+            stock = Stock(**stock_data)
+            stock.current_price = stock.initial_price  # Set current price initially
+            db.session.add(stock)
+        db.session.commit()
 
-# Check if initial stocks are already generated
-if not Stock.query.first():
-    generate_initial_stocks()
+    # Check if initial stocks are already generated
+    if not Stock.query.first():
+        generate_initial_stocks()
 
 # Random stock price generator
 def update_stock_prices():
@@ -117,5 +118,19 @@ def trade():
                     flash('Stock sold successfully', 'success')
                 else:
                     flash('Insufficient shares to sell', 'failure')
-           
+
+    return render_template('trade.html')
+
+@app.route("/portfolio")
+def portfolio():
+    return render_template('portfolio.html')
+
+@app.route("/transaction")
+def transaction():
+    return render_template('transaction.html')
+
+if __name__ == "__main__":
+    with app.app_context():
+        create_app()
+        app.run(debug=True)
 
