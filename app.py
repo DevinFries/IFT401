@@ -5,7 +5,7 @@ import datetime
 import random
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'team2'
+app.config['SECRET_KEY'] = 'your_secret_key_here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -16,8 +16,10 @@ class User(db.Model):
     full_name = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)  # Hashed password for security
     cash_balance = db.Column(db.Float, default=0.0)
-    
+    is_admin = db.Column(db.Boolean, default=False)
+    transactions = db.relationship('Transaction', backref='user', lazy=True)
 
 class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +28,16 @@ class Stock(db.Model):
     volume = db.Column(db.Integer, nullable=False)
     initial_price = db.Column(db.Float, nullable=False)
     current_price = db.Column(db.Float, nullable=False)
-    
+    transactions = db.relationship('Transaction', backref='stock', lazy=True)
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'), nullable=False)
+    action = db.Column(db.String(10), nullable=False)  # Buy or Sell
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 # Initialize the database
 db.create_all()
@@ -76,6 +87,9 @@ def trade():
                     user.cash_balance -= total_cost
                     # Update stock volume
                     stock.volume += number_of_shares
+                    # Record transaction
+                    transaction = Transaction(user_id=user.id, stock_id=stock.id, action='Buy', quantity=number_of_shares, price=stock.current_price)
+                    db.session.add(transaction)
                     flash('Stock purchased successfully', 'success')
                 else:
                     flash('Insufficient funds', 'danger')
@@ -85,6 +99,9 @@ def trade():
                     user.cash_balance += total_cost
                     # Update stock volume
                     stock.volume -= number_of_shares
+                    # Record transaction
+                    transaction = Transaction(user_id=user.id, stock_id=stock.id, action='Sell', quantity=number_of_shares, price=stock.current_price)
+                    db.session.add(transaction)
                     flash('Stock sold successfully', 'success')
                 else:
                     flash('Insufficient shares to sell', 'danger')
@@ -98,11 +115,17 @@ def trade():
 
 @app.route("/portfolio")
 def portfolio():
-    return render_template('portfolio.html')
+    user = User.query.first()  # For demonstration purposes, get the first user
+    return render_template('portfolio.html', user=user)
 
-@app.route("/transaction")
-def transaction():
-    return render_template('transaction.html')
+@app.route("/transaction_history")
+def transaction_history():
+    user = User.query.first()  # For demonstration purposes, get the first user
+    transactions = user.transactions
+    return render_template('transaction_history.html', transactions=transactions)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route("/admin", methods=['GET', 'POST'])
+def admin():
+    if request.method == 'POST':
+        # Check if user is authenticated and authorized as admin
+        # For demonstration
