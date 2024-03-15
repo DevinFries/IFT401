@@ -21,6 +21,18 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)  # Hashed password for security
     cash_balance = db.Column(db.Float, default=0.0)
     is_admin = db.Column(db.Boolean, default=False)
+ 
+ def deposit_cash(self, amount):
+        self.cash_balance += amount
+        db.session.commit()
+
+    def withdraw_cash(self, amount):
+        if self.cash_balance >= amount:
+            self.cash_balance -= amount
+            db.session.commit()
+            return True
+        else:
+            return False
 
 class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
