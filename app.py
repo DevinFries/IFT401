@@ -22,7 +22,7 @@ class User(db.Model):
     cash_balance = db.Column(db.Float, default=0.0)
     is_admin = db.Column(db.Boolean, default=False)
  
- def deposit_cash(self, amount):
+    def deposit_cash(self, amount):
         self.cash_balance += amount
         db.session.commit()
 
