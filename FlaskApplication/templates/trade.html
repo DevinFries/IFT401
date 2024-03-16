@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h1>Trade</h1>
+
+<!-- https://www.youtube.com/watch?v=dKVX22GR7zQ setting up forum-->
+
+<!--
+### Button trigger modal ###
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Launch static backdrop modal
+</button>
+
+### Modal ###
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+### Vertically centered modal ###
+<div class="modal-dialog modal-dialog-centered">
+  ...
+</div>
+-->
+
+
+<!-- blue for buy button -->
+
+<button type="button" class="btn btn-primary bg-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Buy
+</button>
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Buy Stocks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="#">
+          <div class="form-floating">
+            <select name="select1" id="form-select" aria-label="Default select example">  <!-- For future look at \Forums\Datalists -->
+              <option selected>Select a company</option>
+              <option value="1">Google</option>
+              <option value="2">Microsoft</option>
+              <option value="3">Apple</option>
+            </select>
+            <select name="selectQty" id="form-select" aria-label="Default select example">  <!-- For future look at \Forums\Datalists -->
+              <option selected>Select amount</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+        </form>
+        Total Price: $138.94 x 1 = $138.94
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            I Acknowledge ...
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary bg-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- green for sell button -->
+
+<button type="button" class="btn btn-primary bg-success" data-bs-toggle="modal" data-bs-target="#sellButton">
+  Sell
+</button>
+
+<div class="modal fade" id="sellButton" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="sellButtonLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sellButtonLabel">Sell Stocks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="#">
+          <div class="form-floating">
+            <select name="select1" id="form-select" aria-label="Default select example">
+              <option selected>Select a share</option>
+              <option value="1">Google</option>
+              <option value="2">Microsoft</option>
+              <option value="3">Apple</option>
+            </select>
+            <select name="selectQty" id="form-select" aria-label="Default select example">
+              <option selected>Select amount</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>
+        </form>
+        Total Price: $138.94 x 1 = $416.82
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            I Acknowledge ...
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>   
+        <button type="button" class="btn btn-primary bg-success">Confirm</button>               <!-- disable button until box is checked -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+    <div class="col-sm bg-light p-3 border py-5 mt-3 mb-5">
+      Trade fluff row
+    </div>
+</div>
+
+
+{% endblock %}
