@@ -73,10 +73,14 @@ class Stock(db.Model):
         self.price = self.price * random.uniform(0.95, 1.05)
         db.session.commit()
 
-  # Relationship with Stock model through a secondary table
+  # Relationship with Stock model by using a secondary table
     stocks = db.relationship('Stock', secondary='user_stock', backref=db.backref('users', lazy='dynamic'))
 
-    def buy_stock(self, stock, quantity):
+   def buy_stock(self, stock, quantity):
+    # Check if the market is open
+    current_time = datetime.datetime.now().time()
+    current_day = datetime.datetime.now().strftime('%A')
+    if current_day in market_schedule['open_days'] and market_hours['open'] <= current_time <= market_hours['close']:
         if self.cash_balance >= stock.price * quantity:
             self.cash_balance -= stock.price * quantity
             self.stocks.append(stock)
@@ -86,8 +90,15 @@ class Stock(db.Model):
             return True
         else:
             return False
+    else:
+        return False  # Market is not open
 
-    def sell_stock(self, stock, quantity):
+
+def sell_stock(self, stock, quantity):
+    # Check if the market is open
+    current_time = datetime.datetime.now().time()
+    current_day = datetime.datetime.now().strftime('%A')
+    if current_day in market_schedule['open_days'] and market_hours['open'] <= current_time <= market_hours['close']:
         if stock in self.stocks:
             self.cash_balance += stock.price * quantity
             self.stocks.remove(stock)
@@ -96,7 +107,9 @@ class Stock(db.Model):
             db.session.commit()
             return True
         else:
-            return False
+            return False  # Stock not owned by user
+    else:
+        return False  # Market is not open
 
     def view_portfolio(self):
         return self.stocks
