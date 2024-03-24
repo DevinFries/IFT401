@@ -34,7 +34,7 @@ class User(db.Model):
         else:
             return False
 
- def set_market_hours(self, open_time, close_time):
+    def set_market_hours(self, open_time, close_time):
         if self.is_admin:
             # Assuming market_hours is a global variable
             market_hours['open'] = open_time
@@ -51,6 +51,18 @@ class User(db.Model):
         else:
             return False
 
+    def cancel_order(self, transaction_id):
+        transaction = Transaction.query.get(transaction_id)
+        if transaction and transaction.user_id == self.id and not transaction.executed:
+            db.session.delete(transaction)
+            db.session.commit()
+            return True
+        else:
+            return False
+
+    def view_portfolio(self):
+        return self.stocks
+
 # Define global variables for market hours and schedule
 market_hours = {
     'open': datetime.time(9, 00),  # 9:00 AM
@@ -61,16 +73,6 @@ market_schedule = {
     'open_days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 }
 
-def cancel_order(self, transaction_id):
-        transaction = Transaction.query.get(transaction_id)
-        if transaction and transaction.user_id == self.id and not transaction.executed:
-            db.session.delete(transaction)
-            db.session.commit()
-            return True
-        else:
-            return False
-
-
 class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(100), nullable=False)
@@ -78,53 +80,46 @@ class Stock(db.Model):
     volume = db.Column(db.Integer, nullable=False) # Volume of the stock available for trading.
     price = db.Column(db.Float, nullable=False) 
 
- def update_price(self):
+    def update_price(self):
         self.price = self.price * random.uniform(0.95, 1.05)
         db.session.commit()
 
-  # Relationship with Stock model by using a secondary table
+    # Relationship with Stock model by using a secondary table
     stocks = db.relationship('Stock', secondary='user_stock', backref=db.backref('users', lazy='dynamic'))
 
-   def buy_stock(self, stock, quantity):
-    # Check if the market is open
-    current_time = datetime.datetime.now().time()
-    current_day = datetime.datetime.now().strftime('%A')
-    if current_day in market_schedule['open_days'] and market_hours['open'] <= current_time <= market_hours['close']:
-        if self.cash_balance >= stock.price * quantity:
-            self.cash_balance -= stock.price * quantity
-            self.stocks.append(stock)
-            new_transaction = Transaction(user_id=self.id, stock_id=stock.id, action='Buy', quantity=quantity, price=stock.price)
-            db.session.add(new_transaction)
-            db.session.commit()
-            return True
+    def buy_stock(self, stock, quantity):
+        # Check if the market is open
+        current_time = datetime.datetime.now().time()
+        current_day = datetime.datetime.now().strftime('%A')
+        if current_day in market_schedule['open_days'] and market_hours['open'] <= current_time <= market_hours['close']:
+            if self.cash_balance >= stock.price * quantity:
+                self.cash_balance -= stock.price * quantity
+                self.stocks.append(stock)
+                new_transaction = Transaction(user_id=self.id, stock_id=stock.id, action='Buy', quantity=quantity, price=stock.price)
+                db.session.add(new_transaction)
+                db.session.commit()
+                return True
+            else:
+                return False
         else:
-            return False
-    else:
-        return False  # Market is not open
+            return False  # Market is not open
 
-
-def sell_stock(self, stock, quantity):
-    # Check if the market is open
-    current_time = datetime.datetime.now().time()
-    current_day = datetime.datetime.now().strftime('%A')
-    if current_day in market_schedule['open_days'] and market_hours['open'] <= current_time <= market_hours['close']:
-        if stock in self.stocks:
-            self.cash_balance += stock.price * quantity
-            self.stocks.remove(stock)
-            new_transaction = Transaction(user_id=self.id, stock_id=stock.id, action='Sell', quantity=quantity, price=stock.price)
-            db.session.add(new_transaction)
-            db.session.commit()
-            return True
+    def sell_stock(self, stock, quantity):
+        # Check if the market is open
+        current_time = datetime.datetime.now().time()
+        current_day = datetime.datetime.now().strftime('%A')
+        if current_day in market_schedule['open_days'] and market_hours['open'] <= current_time <= market_hours['close']:
+            if stock in self.stocks:
+                self.cash_balance += stock.price * quantity
+                self.stocks.remove(stock)
+                new_transaction = Transaction(user_id=self.id, stock_id=stock.id, action='Sell', quantity=quantity, price=stock.price)
+                db.session.add(new_transaction)
+                db.session.commit()
+                return True
+            else:
+                return False  # Stock not owned by user
         else:
-            return False  # Stock not owned by user
-    else:
-        return False  # Market is not open
-
-    def view_portfolio(self):
-        return self.stocks
-
-    def view_transactions(self):
-        return self.transactions
+            return False  # Market is not open
 
 # Create a secondary table for the many-to-many relationship between User and Stock
 user_stock = db.Table('user_stock',
@@ -140,8 +135,7 @@ class Transaction(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-
-  executed = db.Column(db.Boolean, default=False)
+    executed = db.Column(db.Boolean, default=False)
 
     def execute(self):
         if not self.executed:
@@ -257,4 +251,5 @@ if __name__ == "__main__":
     with app.app_context():
         create_app()
         app.run(debug=True)
+
 
