@@ -61,6 +61,15 @@ market_schedule = {
     'open_days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 }
 
+def cancel_order(self, transaction_id):
+        transaction = Transaction.query.get(transaction_id)
+        if transaction and transaction.user_id == self.id and not transaction.executed:
+            db.session.delete(transaction)
+            db.session.commit()
+            return True
+        else:
+            return False
+
 
 class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -132,20 +141,26 @@ class Transaction(db.Model):
     price = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
- def execute(self):
-        stock = Stock.query.get(self.stock_id)
-        user = User.query.get(self.user_id)
-        if self.action == 'buy':
-            if user.cash_balance >= stock.price * self.quantity:
-                user.cash_balance -= stock.price * self.quantity
-                stock.volume -= self.quantity
-                db.session.commit()
-                return True
-        elif self.action == 'sell':
-            user.cash_balance += stock.price * self.quantity
-            stock.volume += self.quantity
-            db.session.commit()
-            return True
+  executed = db.Column(db.Boolean, default=False)
+
+    def execute(self):
+        if not self.executed:
+            stock = Stock.query.get(self.stock_id)
+            user = User.query.get(self.user_id)
+            if self.action == 'buy':
+                if user.cash_balance >= stock.price * self.quantity:
+                    user.cash_balance -= stock.price * self.quantity
+                    stock.volume -= self.quantity
+                    self.executed = True
+                    db.session.commit()
+                    return True
+            elif self.action == 'sell':
+                if stock in user.stocks:
+                    user.cash_balance += stock.price * self.quantity
+                    stock.volume += self.quantity
+                    self.executed = True
+                    db.session.commit()
+                    return True
         return False
 
 # Initialize the database
