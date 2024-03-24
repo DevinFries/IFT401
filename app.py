@@ -34,6 +34,34 @@ class User(db.Model):
         else:
             return False
 
+ def set_market_hours(self, open_time, close_time):
+        if self.is_admin:
+            # Assuming market_hours is a global variable
+            market_hours['open'] = open_time
+            market_hours['close'] = close_time
+            return True
+        else:
+            return False
+
+    def set_market_schedule(self, open_days):
+        if self.is_admin:
+            # Assuming market_schedule is a global variable
+            market_schedule['open_days'] = open_days
+            return True
+        else:
+            return False
+
+# Define global variables for market hours and schedule
+market_hours = {
+    'open': datetime.time(9, 00),  # 9:00 AM
+    'close': datetime.time(16, 0)  # 4:00 PM
+}
+
+market_schedule = {
+    'open_days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+}
+
+
 class Stock(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(100), nullable=False)
