@@ -41,6 +41,46 @@ class Stock(db.Model):
     volume = db.Column(db.Integer, nullable=False) # Volume of the stock available for trading.
     price = db.Column(db.Float, nullable=False) 
 
+ def update_price(self):
+        self.price = self.price * random.uniform(0.95, 1.05)
+        db.session.commit()
+
+  # Relationship with Stock model through a secondary table
+    stocks = db.relationship('Stock', secondary='user_stock', backref=db.backref('users', lazy='dynamic'))
+
+    def buy_stock(self, stock, quantity):
+        if self.cash_balance >= stock.price * quantity:
+            self.cash_balance -= stock.price * quantity
+            self.stocks.append(stock)
+            new_transaction = Transaction(user_id=self.id, stock_id=stock.id, action='Buy', quantity=quantity, price=stock.price)
+            db.session.add(new_transaction)
+            db.session.commit()
+            return True
+        else:
+            return False
+
+    def sell_stock(self, stock, quantity):
+        if stock in self.stocks:
+            self.cash_balance += stock.price * quantity
+            self.stocks.remove(stock)
+            new_transaction = Transaction(user_id=self.id, stock_id=stock.id, action='Sell', quantity=quantity, price=stock.price)
+            db.session.add(new_transaction)
+            db.session.commit()
+            return True
+        else:
+            return False
+
+    def view_portfolio(self):
+        return self.stocks
+
+    def view_transactions(self):
+        return self.transactions
+
+# Create a secondary table for the many-to-many relationship between User and Stock
+user_stock = db.Table('user_stock',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('stock_id', db.Integer, db.ForeignKey('stock.id'), primary_key=True)
+)
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,6 +90,22 @@ class Transaction(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+ def execute(self):
+        stock = Stock.query.get(self.stock_id)
+        user = User.query.get(self.user_id)
+        if self.action == 'buy':
+            if user.cash_balance >= stock.price * self.quantity:
+                user.cash_balance -= stock.price * self.quantity
+                stock.volume -= self.quantity
+                db.session.commit()
+                return True
+        elif self.action == 'sell':
+            user.cash_balance += stock.price * self.quantity
+            stock.volume += self.quantity
+            db.session.commit()
+            return True
+        return False
 
 # Initialize the database
 def create_app():
@@ -80,7 +136,7 @@ def update_stock_prices():
         fluctuation = random.uniform(-10, 10)  # Random fluctuation in percentage
         new_price = stock.current_price * (1 + fluctuation / 100)
         stock.current_price = round(new_price, 2)
-    db.session.commit()
+    db.session.commit() 
 
 # Define routes
 @app.route("/")
