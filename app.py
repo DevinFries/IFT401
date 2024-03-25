@@ -4,11 +4,10 @@ from sqlalchemy.sql import func
 import os
 import datetime
 import random
-app = Flask(__name__)
  
-app = Flask(__name__)
+app = Flask(app.py)
 app.config['SECRET_KEY'] = 'team2'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost:3386/stocks'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:eadgbe21@localhost:3306'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -36,7 +35,7 @@ class User(db.Model):
 
     def set_market_hours(self, open_time, close_time):
         if self.is_admin:
-            # Assuming market_hours is a global variable
+            # market_hours is a global variable
             market_hours['open'] = open_time
             market_hours['close'] = close_time
             return True
@@ -45,7 +44,7 @@ class User(db.Model):
 
     def set_market_schedule(self, open_days):
         if self.is_admin:
-            # Assuming market_schedule is a global variable
+            # market_schedule is a global variable
             market_schedule['open_days'] = open_days
             return True
         else:
@@ -102,7 +101,7 @@ class Stock(db.Model):
             else:
                 return False
         else:
-            return False  # Market is not open
+             return False  # Market is not open
 
     def sell_stock(self, stock, quantity):
         # Check if the market is open
@@ -137,7 +136,8 @@ class Transaction(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     executed = db.Column(db.Boolean, default=False)
 
-    def execute(self):
+    def execute(self):                  #buy and sell action checks if the user money to purchase the specified quantity of stock,
+                                        #if they do, it deducts the cost from the user's cash balance and updates the stock's volume
         if not self.executed:
             stock = Stock.query.get(self.stock_id)
             user = User.query.get(self.user_id)
@@ -161,7 +161,7 @@ class Transaction(db.Model):
 def create_app():
     db.create_all()
 
-    # Generate initial stock data (for demonstration purposes)
+    # Generate initial stock data
     def generate_initial_stocks():
         stocks_data = [
             {"company_name": "Apple Inc.", "ticker": "AAPL", "volume": 1000, "initial_price": 150.0},
