@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="row-dirt text-center p-3" style="max-width: 85%; margin: auto;">
+    <div class="row">
+        <div class="col-sm bg-light p-3 border py-5 mt-3 mb-5">
+          Contact fluff row
+        </div>
+    </div>
+    
+    <div style="width: 50%; margin: auto;">
+        {% for comment in comments %}
+        <div style="padding: 10px; background-color: #eee; margin: 20px;">
+            <p style="font-size: 24px;">{{ comment }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}
