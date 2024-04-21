@@ -1,17 +1,20 @@
 from flask import Flask, render_template
-#from flask_sqlalchemy import SQLAlchemy
-#from sqlalchemy.sql import func
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 import datetime
 import os
 app = Flask(__name__)
+app.debug = True
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 '''
-app.config['mysql://root:password@host:3306/localhost'] =\
-        'sqlite:///' + os.path.join(basedir, 'database.db')
+app.config['mysql://root:password@host:3306/localhost'] ='sqlite:///' + os.path.join(basedir, 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@host:3306/localhost'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql-pymysql://root:password@host:3306/localhost'
+
+app.config['SQLALCEHMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 '''
 
@@ -40,6 +43,16 @@ def portfolio():
 @app.route("/transaction")
 def transaction():
     return render_template('transaction.html')
+
+
+@app.route("/account")
+def account():
+    return render_template('account.html')
+
+@app.route("/newacc")
+def newacc():
+    return render_template('newacc.html')
+
 
 #Models
 '''

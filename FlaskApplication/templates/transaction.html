@@ -1,82 +1,32 @@
 {% extends "base.html" %}
 {% block body %}
 
-<h1>Transactions</h1>
-
-<!-- table with buy button. side note if you want to buy should it redirect to the stock page or pop up a modal-thing -->
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Ticker Symbol</th>
-      <th scope="col">Ticker Name</th>
-      <th scope="col">Price</th>
-      <th scope="col">Quantity</th>
-      <th scope="col">Balance Changes</th>    <!-- indicate bought/sold with text color red/green-->
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">GOOGL</th>
-      <td>Alphabet Inc.</td>
-      <td>$138.94</td>
-      <td>1</td>
-      <td>+ $138.94</td>
-    </tr>
-    <tr>
-      <th scope="row">MSFT</th>
-      <td>Microsoft Corporation</td>
-      <td>$404.62</td>
-      <td>2</td>
-      <td>- $809.04</td>
-    </tr>
-    <tr>
-      <th scope="row">AAPL</th>
-      <td>Apple Inc. </td>
-      <td>$172.75</td>
-      <td>3</td>
-      <td>+ $518.25</td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- <table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
-  </tbody>
-</table>
-
--->
-
-
-<div class="row">
-    <div class="col-sm bg-light p-3 border py-5 mt-3 mb-5">
-      Transactions fluff row
-    </div>
+<div class="row-dirt text-center p-3" style="max-width: 85%; margin: auto;">
+  <!-- table with buy button. side note if you want to buy should it redirect to the stock page or pop up a modal-thing -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Ticker Symbol</th>
+        <th scope="col">Ticker Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Transaction Type</th>
+        <th scope="col">Transaction Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transaction in transactions %}
+      <tr>
+        <td>{{ transaction.stock.ticker_symbol }}</td>
+        <td>{{ transaction.stock.company_name }}</td>
+        <td>${{ transaction.price }}</td>
+        <td>{{ transaction.quanity }}</td>
+        <td>{{ transaction.type }}</td>
+        <td>{{ transaction.timestamp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
-
 
 {% endblock %}
