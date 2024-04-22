@@ -1,6 +1,6 @@
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
+from flask_sqlalchemy import SQLAlchemy 
+from sqlalchemy.sql import func 
 import datetime
 import os
 app = Flask(__name__)

@@ -1,11 +1,64 @@
 {% extends "base.html" %}
 {% block body %}
 
+
 <div class="row-dirt text-center p-3" style="max-width: 85%; margin: auto;">
+    
+        <select class="form-select" onchange="newSelectVal" aria-label="Default select example" style="max-width: 40%;">
+            <option value="appl">Apple Inc.</option>
+            <option value="msft">Microsoft Corp.</option>
+            <option value="googl">Alphabet Inc.</option>
+            <option value="fb">Facebook, Inc.</option>
+        </select>
+    
+        <table class="table table-striped" name="tablePort" method="GET" action="/" style="max-width: 40%;">
+            <thead>
+                <tr>
+                    <th scope="col">Ticker Symbol</th>
+                    <th scope="col">Ticker Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Volume</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                <tr>
+                    <td>APPL</td>
+                    <td>Apple Inc.</td>
+                    <td>$$$</td>
+                    <td>###</td>
+                </tr>
+            </tbody>
 
+            <tbody>
+                <tr>
+                    <td>MSFT</td>
+                    <td>Microsoft Corp.</td>
+                    <td>$$$</td>
+                    <td>###</td>
+                </tr>
+            </tbody>
 
-  
+            <tbody>
+                <tr>
+                    <td>GOOGL</td>
+                    <td>Alphabet Inc.</td>
+                    <td>$$$</td>
+                    <td>###</td>
+                </tr>
+            </tbody>
+
+            <tbody>
+                <tr>
+                    <td>FB</td>
+                    <td>Facebook, Inc.</td>
+                    <td>$$$</td>
+                    <td>###</td>
+                </tr>
+            </tbody>
+    </table>
 </div>
 
 
 {% endblock %}
+
